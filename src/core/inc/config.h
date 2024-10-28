@@ -61,7 +61,7 @@ struct perf_monitor_config {
     size_t* events;
     size_t sampling_period_us;
     paddr_t results_base_addr;
-    size_t results_size;
+    size_t num_samples;
 };
 
 struct vm_config {

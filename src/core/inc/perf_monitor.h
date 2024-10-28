@@ -23,7 +23,7 @@ typedef struct {
 } perf_monitor;
 
 
-void perf_monitor_init(struct perf_monitor_config config);
+void perf_monitor_init(struct vm* vm_config, struct perf_monitor_config perf_config);
 void perf_monitor_setup_event_counters(size_t* events, size_t num_events);
 void perf_monitor_timer_init(size_t perf_monitor_period_us);
 void perf_monitor_irq_handler(unsigned int irq);

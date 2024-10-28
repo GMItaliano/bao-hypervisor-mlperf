@@ -14,19 +14,38 @@ size_t perf_monitor_results[MAX_EVENTS];
 
 perf_monitor performance_monitor;
 
-#define NUM_PERF_MON_SAMPLES    3
-void perf_monitor_init(struct perf_monitor_config perf_config) {
+#define PERF_DATA_INDEX(sample_index, event_index, cpu_index, events_num, num_cpus) \
+    ((sample_index) * (events_num) * (num_cpus) + (event_index) * (num_cpus) + (cpu_index))
 
-    size_t mem_reg_size = NUM_PAGES(perf_config.results_size);
-    struct ppages* pa_ptr = NULL;
-    vaddr_t va = mem_alloc_map(&cpu()->as, SEC_HYP_GLOBAL, pa_ptr, INVALID_VA, mem_reg_size, PTE_HYP_FLAGS);
-    if (va == INVALID_VA) {
-        ERROR("failed to VM's perf monitor region");
+#define PERF_MONITOR_WRITE_SAMPLE(sample_index, event_index, cpu_index, events_num, num_cpus, value) \
+    perf_counters[PERF_DATA_INDEX(sample_index, event_index, cpu_index, events_num, num_cpus)] = value
+
+#define PERF_MONITOR_READ_SAMPLE(sample_index, event_index, cpu_index, events_num, num_cpus) \
+    perf_counters[PERF_DATA_INDEX(sample_index, event_index, cpu_index, events_num, num_cpus)]
+
+
+void perf_monitor_init(struct vm* vm_config, struct perf_monitor_config perf_config) {
+
+    if(cpu_is_master()){
+        performance_monitor.events_num = perf_config.events_num;
+        performance_monitor.num_profiling_samples = perf_config.num_samples;
+        size_t num_cpus = vm_config->cpu_num;
+        size_t mem_reg_size =   sizeof(size_t) * 
+                                performance_monitor.events_num * 
+                                performance_monitor.num_profiling_samples * 
+                                num_cpus;
+    
+        size_t num_pages = NUM_PAGES(mem_reg_size);
+        struct ppages* pa_ptr = NULL;
+        vaddr_t va = mem_alloc_map(&cpu()->as, SEC_HYP_GLOBAL, pa_ptr, INVALID_VA, num_pages, PTE_HYP_FLAGS);
+
+        if (va == INVALID_VA) {
+            ERROR("failed to VM's perf monitor region");
+        }
+        perf_counters = (size_t*)va;
     }
+    cpu_sync_barrier(&vm_config->sync);
 
-    performance_monitor.profiling_results = (size_t*)va;
-    performance_monitor.events_num = perf_config.events_num;
-    performance_monitor.num_profiling_samples = NUM_PERF_MON_SAMPLES * perf_config.events_num;
     perf_monitor_setup_event_counters(perf_config.events, perf_config.events_num);
     perf_monitor_timer_init(perf_config.sampling_period_us);
 }
