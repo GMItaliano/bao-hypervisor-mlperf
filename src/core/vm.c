@@ -9,6 +9,7 @@
 #include <cache.h>
 #include <config.h>
 #include <shmem.h>
+#include <perf_monitor.h>
 
 static void vm_master_init(struct vm* vm, const struct vm_config* vm_config, vmid_t vm_id)
 {
@@ -271,6 +272,7 @@ struct vm* vm_init(struct vm_allocation* vm_alloc, const struct vm_config* vm_co
         vm_init_mem_regions(vm, vm_config);
         vm_init_dev(vm, vm_config);
         vm_init_ipc(vm, vm_config);
+        perf_monitor_init(vm_config->perf_monitor);
     }
 
     cpu_sync_and_clear_msgs(&vm->sync);

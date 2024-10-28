@@ -11,3 +11,5 @@ cpu-objs-y+=$(ARCH_PROFILE)/smmuv2.o
 cpu-objs-y+=$(ARCH_PROFILE)/iommu.o
 cpu-objs-y+=$(ARCH_PROFILE)/cpu.o
 cpu-objs-y+=$(ARCH_PROFILE)/smc.o
+cpu-objs-y+=$(ARCH_PROFILE)/timer.o
+cpu-objs-y+=$(ARCH_PROFILE)/pmu.o

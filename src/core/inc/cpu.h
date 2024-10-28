@@ -33,6 +33,10 @@ struct cpu {
 
     struct cpu_arch arch;
 
+    size_t perf_events_counters_num;
+
+    BITMAP_ALLOC(perf_events_bitmap, 32);
+
     struct cpuif* interface;
 
     uint8_t stack[STACK_SIZE] __attribute__((aligned(PAGE_SIZE)));
