@@ -20,10 +20,13 @@ size_t perf_monitor_results[MAX_EVENTS];
     perf_results_arr[PERF_DATA_INDEX(sample_index, event_index, cpu_index, events_num, num_cpus)] = value
 
 
-/*
+
 #define PERF_MONITOR_READ_SAMPLE(perf_results_arr, sample_index, event_index, cpu_index, events_num, num_cpus) \
     perf_results_arr[PERF_DATA_INDEX(sample_index, event_index, cpu_index, events_num, num_cpus)]
-*/
+
+
+#define CHECK_CPUS_MEM_DUMP(bitmap, N) (((bitmap) & ((1UL << (size_t)(N)) - 1)) == ((1UL << (size_t)(N)) - 1))
+
 
 void perf_monitor_init(struct vm* vm, struct perf_monitor_config perf_config) {
 
@@ -47,6 +50,7 @@ void perf_monitor_init(struct vm* vm, struct perf_monitor_config perf_config) {
     cpu_sync_barrier(&vm->sync);
 
     vm->perf_monitor.array_sample_index[cpu()->id] = 0;
+    vm->perf_monitor.cpu_mem_dump_bitmap = 0;
     perf_monitor_setup_event_counters(perf_config.events, perf_config.events_num);
     perf_monitor_timer_init(perf_config.sampling_period_us);
 }
@@ -98,7 +102,34 @@ void perf_monitor_irq_handler(unsigned int irq) {
     }
 
     if( cpu()->vcpu->vm->perf_monitor.array_sample_index[cpu()->id] >= cpu()->vcpu->vm->perf_monitor.num_profiling_samples) {
+    
+        cpu()->vcpu->vm->perf_monitor.cpu_mem_dump_bitmap ^= (1UL << (size_t)cpu()->id);         // bitmap to know which cpu as reached this position
+
         // Dump results on cpu master
+        if(CHECK_CPUS_MEM_DUMP(cpu()->vcpu->vm->perf_monitor.cpu_mem_dump_bitmap, cpu()->vcpu->vm->cpu_num) && cpu_is_master())
+        {
+            size_t event_count = 0;
+            size_t profiling_result = 0;
+
+            for(size_t cpu_index = 0; cpu_index < cpu()->vcpu->vm->cpu_num; cpu_index++)       // Read each CPU
+            {
+                console_printk("\nCPU-%d\n", cpu_index);
+                for(size_t sample_index = 0; sample_index < cpu()->vcpu->vm->perf_monitor.num_profiling_samples; sample_index++)       // Read each sample
+                {
+                    profiling_result = PERF_MONITOR_READ_SAMPLE(cpu()->vcpu->vm->perf_monitor.array_profiling_results,
+                                                                sample_index,
+                                                                event_count,
+                                                                cpu_index,
+                                                                cpu()->vcpu->vm->perf_monitor.events_num,
+                                                                cpu()->vcpu->vm->cpu_num);
+
+                    console_printk("sample[%d]counter_id[%d]=%lu\n", sample_index, event_count++, profiling_result);
+
+                    if(event_count == cpu()->vcpu->vm->perf_monitor.events_num)
+                        event_count = 0;
+                }
+            }
+        }
     }
 
     else {
