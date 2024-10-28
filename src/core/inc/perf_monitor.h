@@ -18,13 +18,13 @@ struct perf_monitor {
 
     size_t* array_profiling_results;
     size_t num_profiling_samples;
+    size_t cpu_mem_dump_bitmap;
 };
 
 struct perf_monitor_config {
     uint64_t events_num;
     size_t* events;
     uint64_t sampling_period_us;
-    paddr_t results_base_addr;
     size_t num_samples;
 };
 
