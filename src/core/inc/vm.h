@@ -17,6 +17,7 @@
 #include <bitmap.h>
 #include <io.h>
 #include <ipc.h>
+#include <perf_monitor.h>
 
 struct vm_mem_region {
     paddr_t base;
@@ -84,6 +85,8 @@ struct vm {
 
     size_t ipc_num;
     struct ipc* ipcs;
+
+    struct perf_monitor perf_monitor;
 };
 
 struct vcpu {

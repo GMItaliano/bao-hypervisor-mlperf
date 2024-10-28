@@ -8,22 +8,27 @@
 
 #include <bao.h>
 #include <timer.h>
-#include <config.h>
 #include <events.h>
 
-typedef struct {
+struct perf_monitor {
+    size_t* array_events;
+    size_t* array_sample_index;
     size_t events_num;
-    size_t* events;
     size_t sampling_period_us;
-    size_t sample_index;
-    size_t* perf_counters;
 
-    size_t* profiling_results;
+    size_t* array_profiling_results;
     size_t num_profiling_samples;
-} perf_monitor;
+};
 
+struct perf_monitor_config {
+    uint64_t events_num;
+    size_t* events;
+    uint64_t sampling_period_us;
+    paddr_t results_base_addr;
+    size_t num_samples;
+};
 
-void perf_monitor_init(struct vm* vm_config, struct perf_monitor_config perf_config);
+void perf_monitor_init(struct vm* vm, struct perf_monitor_config perf_config);
 void perf_monitor_setup_event_counters(size_t* events, size_t num_events);
 void perf_monitor_timer_init(size_t perf_monitor_period_us);
 void perf_monitor_irq_handler(unsigned int irq);

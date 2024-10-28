@@ -10,6 +10,7 @@
 #include <platform.h>
 #include <vm.h>
 #include <config_defs.h>
+#include <perf_monitor.h>
 
 #ifndef GENERATING_DEFS
 // clang-format wont correctly recognize the syntax of assembly strings interleaved with
@@ -56,14 +57,6 @@
 /* CONFIG_HEADER is just defined for compatibility with older configs */
 #define CONFIG_HEADER
 
-struct perf_monitor_config {
-    size_t events_num;
-    size_t* events;
-    size_t sampling_period_us;
-    paddr_t results_base_addr;
-    size_t num_samples;
-};
-
 struct vm_config {
     /**
      * To setup the image field either the VM_IMAGE_BUILTIN or VM_IMAGE_LOADED macros should be
@@ -107,6 +100,7 @@ struct vm_config {
     struct vm_platform platform;
 
     /* Definition of Performance Monitor/Profiler */
+    bool en_perf_monitor;
     struct perf_monitor_config perf_monitor;
 };
 
