@@ -33,6 +33,125 @@
 
 #define ERROR_NO_MORE_EVENT_COUNTERS    UINT64_MAX
 
+// PMU EVENTS
+
+#define L1I_CACHE_REFILL 0x01
+#define L1I_TLB_REFILL 0x02
+#define L1D_CACHE_REFILL 0x03
+#define L1D_CACHE 0x04
+#define L1D_TLB_REFILL 0x05
+#define LD_RETIRED 0x06
+#define ST_RETIRED 0x07
+#define INST_RETIRED 0x08
+#define EXC_TAKEN 0x09
+#define EXC_RETURN 0x0A
+#define CID_WRITE_RETIRED 0x0B
+#define PC_WRITE_RETIRED 0x0C
+#define BR_IMMED_RETIRED 0x0D
+#define UNALIGNED_LDST_RETIRED 0x0F
+#define BR_MIS_PRED 0x10
+#define CPU_CYCLES 0x11
+#define BR_PRED 0x12
+#define MEM_ACCESS 0x13
+#define L1I_CACHE 0x14
+#define L1D_CACHE_WB 0x15
+#define L2D_CACHE 0x16
+#define L2D_CACHE_REFILL 0x17
+#define L2D_CACHE_WB 0x18
+#define BUS_ACCESS 0x19
+#define MEMORY_ERROR 0x1A
+#define BUS_CYCLES 0x1D
+#define CHAIN 0x1E
+#define BUS_ACCESS_LD 0x60
+#define BUS_ACCESS_ST 0x61
+#define BR_INDIRECT_SPEC 0x7A
+#define EXC_IRQ 0x86
+#define EXC_FIQ 0x87
+#define EXT_MEM_REQ 0xC0                    //External memory request
+#define NC_EXT_MEM_REQ 0xC1                 //Non-cacheable external memory request
+#define LINEFILL_PREF 0xC2                  //Linefill because of prefetch
+#define INST_CACH_THRT_OCC 0xC3             //Instruction Cache Throttle occurred.
+#define ENT_RD_ALLOC_MD 0xC4                //Entering read allocate mode.
+#define RD_ALLOC_MD 0xC5                    //Read allocate mode.
+#define PREDEC_ERROR 0xC6                   //Pre-decode error.             
+#define DT_WR_PIPELINE_STALL 0xC7           //Data Write operation that stalls the pipeline because the store buffer is full.
+#define SCU_SNOOPED_CPU_F_CPU 0xC8          //SCU Snooped data from another CPU for this CPU
+#define CD_BR_EXEC 0xC9                     //Conditional branch executed.
+#define IND_BR_MISPRED 0xCA                 //Indirect branch mispredicted.
+#define IND_BR_MISPRED_ADDR_MISCOMP 0xCB    //Indirect branch mispredicted because of address miscompare.
+#define CD_BR_MISPRED 0xCC                  //Conditional branch mispredicted.
+#define L1I_MEM_ERROR 0xD0                  //L1 Instruction Cache (data or tag) memory error.
+#define L1D_MEM_ERROR 0xD1                  //L1 Data Cache (data, tag or dirty) memory error, correctable or non-correctable.
+#define TLB_MEM_ERROR 0xD2                  //TLB memory error.
+#define ATTR_PERF_IMPCT_EVENT1 0xE0         //Attributable Performance Impact Event. Counts every cycle that the DPU IQ is empty and that is not because of a recent micro-TLB miss, instruction cache miss or pre-decode error.
+#define ATTR_PERF_IMPCT_EVENT2 0xE1         //Counts every cycle the DPU IQ is empty and there is an instruction cache miss being processed.
+#define ATTR_PERF_IMPCT_EVENT3 0xE2         //Counts every cycle the DPU IQ is empty and there is an instruction micro-TLB miss being processed.
+#define ATTR_PERF_IMPCT_EVENT4 0xE3         //Counts every cycle the DPU IQ is empty and there is a pre-decode error being processed.
+#define ATTR_PERF_IMPCT_EVENT5 0xE4         //Counts every cycle there is an interlock that is not because of an Advanced SIMD or Floating-point instruction, and not because of a load/store instruction waiting for data to calculate the address in the AGU. Stall cycles because of a stall in Wr, typically awaiting load data, are excluded.
+#define ATTR_PERF_IMPCT_EVENT6 0xE5         //Counts every cycle there is an interlock that is because of a load/store instruction waiting for data to calculate the address in the AGU.
+#define ATTR_PERF_IMPCT_EVENT7 0xE6         //Counts every cycle there is an interlock that is because of an Advanced SIMD or Floating-point instruction.
+#define ATTR_PERF_IMPCT_EVENT8 0xE7         //Counts every cycle there is a stall in the Wr stage because of a load miss 
+#define ATTR_PERF_IMPCT_EVENT9 0xE8         //Counts every cycle there is a stall in the Wr stage because of a store.
+
+static const size_t array_events[] = {
+    L1I_CACHE_REFILL, 
+    L1I_TLB_REFILL, 
+    L1D_CACHE_REFILL, 
+    L1D_CACHE,
+    L1D_TLB_REFILL, 
+    LD_RETIRED,
+    ST_RETIRED, 
+    INST_RETIRED, 
+    EXC_TAKEN,
+    EXC_RETURN, 
+    CID_WRITE_RETIRED, 
+    PC_WRITE_RETIRED, 
+    BR_IMMED_RETIRED,
+    UNALIGNED_LDST_RETIRED, 
+    BR_MIS_PRED, 
+    CPU_CYCLES, 
+    BR_PRED, 
+    MEM_ACCESS,
+    L1I_CACHE, 
+    L1D_CACHE_WB, 
+    L2D_CACHE, 
+    L2D_CACHE_REFILL, 
+    L2D_CACHE_WB,
+    BUS_ACCESS, 
+    MEMORY_ERROR, 
+    BUS_CYCLES, 
+    CHAIN, 
+    BUS_ACCESS_LD, 
+    BUS_ACCESS_ST,
+    BR_INDIRECT_SPEC, 
+    EXC_IRQ, 
+    EXC_FIQ, 
+    EXT_MEM_REQ, 
+    NC_EXT_MEM_REQ, 
+    LINEFILL_PREF,
+    INST_CACH_THRT_OCC, 
+    ENT_RD_ALLOC_MD, 
+    RD_ALLOC_MD, 
+    PREDEC_ERROR,
+    DT_WR_PIPELINE_STALL, 
+    SCU_SNOOPED_CPU_F_CPU, 
+    CD_BR_EXEC, 
+    IND_BR_MISPRED,
+    IND_BR_MISPRED_ADDR_MISCOMP, 
+    CD_BR_MISPRED, 
+    L1I_MEM_ERROR, 
+    L1D_MEM_ERROR,
+    TLB_MEM_ERROR, 
+    ATTR_PERF_IMPCT_EVENT1, 
+    ATTR_PERF_IMPCT_EVENT2, 
+    ATTR_PERF_IMPCT_EVENT3,
+    ATTR_PERF_IMPCT_EVENT4, 
+    ATTR_PERF_IMPCT_EVENT5, 
+    ATTR_PERF_IMPCT_EVENT6,
+    ATTR_PERF_IMPCT_EVENT7, 
+    ATTR_PERF_IMPCT_EVENT8, 
+    ATTR_PERF_IMPCT_EVENT9
+};
 
 uint64_t pmu_cntr_alloc(void);
 void pmu_cntr_free(uint64_t);
@@ -205,7 +324,7 @@ static inline void pmu_set_evtyper(size_t counter, size_t event) {
 
     // Set the event type value in the PMXEVTYPER_EL0 register based on the
     // event.
-    pmxevtyper = bit_insert(pmxevtyper, event, 0, 10);
+    pmxevtyper = bit_insert(pmxevtyper, array_events[event], 0, 10);
 
     // Write the updated value back to the PMXEVTYPER_EL0 register to set
     // the event type.
