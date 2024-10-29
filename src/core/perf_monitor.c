@@ -31,6 +31,7 @@ size_t perf_monitor_results[MAX_EVENTS];
 void perf_monitor_init(struct vm* vm, struct perf_monitor_config perf_config) {
 
     if(cpu_is_master()){
+        // vaddr for storing PMU events
         vm->perf_monitor.events_num = perf_config.events_num;
         vm->perf_monitor.num_profiling_samples = perf_config.num_samples;
         size_t mem_reg_size =   sizeof(size_t) *
@@ -44,13 +45,25 @@ void perf_monitor_init(struct vm* vm, struct perf_monitor_config perf_config) {
 
         if (va == INVALID_VA) {
             ERROR("failed to VM's perf monitor region");
+        }
+        vm->perf_monitor.array_profiling_results = (size_t*)va;
         
-        vm->perf_monitor.array_profiling_results = (size_t*)va;}
+        // vaddr for storing samples index
+        size_t num_pages_index = NUM_PAGES(sizeof(size_t) * vm->cpu_num);
+        vaddr_t va_index = mem_alloc_map(&cpu()->as, SEC_HYP_GLOBAL, pa_ptr, INVALID_VA, num_pages_index, PTE_HYP_FLAGS);
+
+        if (va_index == INVALID_VA) {
+            ERROR("failed to VM's perf monitor index region");
+        }
+        vm->perf_monitor.array_sample_index = (size_t*)va_index;
+        
+
     }
     cpu_sync_barrier(&vm->sync);
 
     vm->perf_monitor.array_sample_index[cpu()->id] = 0;
     vm->perf_monitor.cpu_mem_dump_bitmap = 0;
+
     perf_monitor_setup_event_counters(perf_config.events, perf_config.events_num);
     perf_monitor_timer_init(perf_config.sampling_period_us);
 }
@@ -125,7 +138,7 @@ void perf_monitor_irq_handler(unsigned int irq) {
 
                     console_printk("sample[%d]counter_id[%d]=%lu\n", sample_index, event_count++, profiling_result);
 
-                    if(event_count == cpu()->vcpu->vm->perf_monitor.events_num)
+                    if(event_count >= cpu()->vcpu->vm->perf_monitor.events_num)
                         event_count = 0;
                 }
             }
