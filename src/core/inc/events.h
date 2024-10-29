@@ -10,18 +10,6 @@
 
 #define EVENTS_CNTR_MAX_NUM    EVENTS_ARCH_CNTR_MAX_NUM
 
-
-/**
- * @brief Enumeration defining different events for performance event counters.
- */
-typedef enum {
-    mem_access = 0,            // Memory access event.
-    l2_cache_access,           // L2 cache access event.
-    bus_access,                // Bus access event.
-    external_mem_request,      // External memory request event.
-    l2_cache_refill            // L2 cache refill event.
-} events_enum;
-
 /**
  * @brief Allocates an event counter.
  *
@@ -99,7 +87,7 @@ static inline uint64_t events_get_cntr_value(size_t counter) {
  * @param counter The event counter to set the event type for.
  * @param event The event type to set.
  */
-static inline void events_set_evtyper(size_t counter, events_enum event) {
+static inline void events_set_evtyper(size_t counter, size_t event) {
     events_arch_set_evtyper(counter, event);
 }
 
