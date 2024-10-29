@@ -8,6 +8,14 @@
 #include <platform.h>
 #include <arch/sysregs.h>
 
+#if (GIC_VERSION == GICV2)
+#include <arch/gicv2.h>
+#elif (GIC_VERSION == GICV3)
+#include <arch/gicv3.h>
+#else 
+#error "unknown GIV version " GIC_VERSION
+#endif
+
 cpuid_t CPU_MASTER __attribute__((section(".data")));
 
 /* Perform architecture dependent cpu cores initializations */
