@@ -60,6 +60,8 @@ void perf_monitor_setup_event_counters(size_t* events, size_t num_events) {
 
     num_counters = num_events;
 
+    events_enable();
+
     for(size_t i = 0; i < num_events; i++) {
 
         size_t counter_id = events_cntr_alloc();
@@ -72,8 +74,6 @@ void perf_monitor_setup_event_counters(size_t* events, size_t num_events) {
         events_clear_cntr_ovs(counter_id);
         events_cntr_enable(counter_id);
     }
-
-    events_enable();
 }
 
 void perf_monitor_timer_init(size_t perf_monitor_period_us) {
