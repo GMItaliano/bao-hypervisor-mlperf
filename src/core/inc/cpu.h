@@ -33,9 +33,9 @@ struct cpu {
 
     struct cpu_arch arch;
 
-    uint64_t is_handling_irq;
+    uint32_t is_handling_irq;
 
-    uint64_t handling_irq_id;
+    uint32_t handling_irq_id;
 
     size_t perf_events_counters_num;
 
