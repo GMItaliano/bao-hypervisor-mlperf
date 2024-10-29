@@ -34,3 +34,16 @@ void cpu_arch_idle(void)
                      "j cpu_idle_wakeup\n\r" ::"r"(&cpu()->stack[STACK_SIZE]));
     ERROR("returned from idle wake up");
 }
+
+void cpu_arch_interrupt_finish()
+{
+    if(cpu()->is_handling_irq)
+    {
+        plic_hart[cpu()->arch.plic_cntxt].complete = cpu()->handling_irq_id;
+        cpu()->is_handling_irq = 0;
+    }
+}
+
+void cpu_arch_standby() {
+    cpu_arch_idle();
+}

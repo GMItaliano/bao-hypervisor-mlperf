@@ -33,6 +33,31 @@ void cpu_arch_idle()
      */
     __asm__ volatile("mov sp, %0\n\r"
                      "b cpu_idle_wakeup\n\r" ::"r"(&cpu()->stack[STACK_SIZE]));
+    ERROR("returned from idle wake up");
+}
+
+void cpu_arch_interrupt_finish(void)
+{
+    if(cpu()->is_handling_irq)
+    {
+        gicc_eoir(cpu()->handling_irq_id);
+        gicc_dir(cpu()->handling_irq_id);
+        cpu()->is_handling_irq = 0;
+    }
+}
+
+
+void cpu_arch_standby(void) {
+    /**
+     * Wait for an interrupt
+     */
+    __asm__ volatile("wfi");
+
+    __asm__ volatile(
+        "mov sp, %0\n\r"
+        "b cpu_idle_wakeup\n\r"
+        ::"r"(&cpu()->stack[STACK_SIZE]));
 
     ERROR("returned from idle wake up");
+
 }
