@@ -91,6 +91,11 @@ void cpu_msg_handler(void)
 
 void cpu_idle(void)
 {
+    if(cpu()->is_handling_irq)
+    {
+        cpu_arch_interrupt_finish();
+    }
+
     cpu_arch_idle();
 
     /**
@@ -98,6 +103,23 @@ void cpu_idle(void)
      * stack.
      */
     ERROR("Spurious idle wake up");
+}
+
+void cpu_standby(void)
+{
+    if(cpu()->is_handling_irq)
+    {
+        cpu_arch_interrupt_finish();
+    }
+
+    cpu_arch_standby();
+
+    /**
+     * Should not return here.
+     * cpu should "wake up" from idle in cpu_idle_wakeup
+     * with a rewinded stack.
+     */
+    ERROR("Spurious idle wake up"); 
 }
 
 void cpu_idle_wakeup(void)
