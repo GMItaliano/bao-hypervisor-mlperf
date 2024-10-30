@@ -20,6 +20,7 @@
 void interrupts_arch_init()
 {
     gic_init();
+    interrupts_cpu_enable(platform.arch.gic.maintenance_id, true);
 }
 
 void interrupts_arch_ipi_send(cpuid_t target_cpu, irqid_t ipi_id)
