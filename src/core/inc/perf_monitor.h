@@ -10,9 +10,12 @@
 #include <timer.h>
 #include <events.h>
 
+#define PERF_MONITOR_MAX_EVENTS 32
+#define PERF_MONITOR_MAX_CPUS   32
+
 struct perf_monitor {
-    size_t* array_events;
-    size_t* array_sample_index;
+    size_t array_events[PERF_MONITOR_MAX_EVENTS];
+    size_t array_sample_index[PERF_MONITOR_MAX_CPUS];
     size_t events_num;
     size_t sampling_period_us;
 
@@ -22,9 +25,9 @@ struct perf_monitor {
 };
 
 struct perf_monitor_config {
-    uint64_t events_num;
+    size_t events_num;
     size_t* events;
-    uint64_t sampling_period_us;
+    size_t sampling_period_us;
     size_t num_samples;
 };
 
