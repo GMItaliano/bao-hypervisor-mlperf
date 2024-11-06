@@ -119,7 +119,7 @@ void perf_monitor_irq_handler(unsigned int irq) {
                                                                 cpu()->vcpu->vm->perf_monitor.events_num,
                                                                 cpu()->vcpu->vm->cpu_num);
 
-                    console_printk("Sample[%d]counter_id[%d]=%lu\n",sample_count, event_count++, profiling_result);
+                    console_printk("[%d][%d]=%lu\n",sample_count, event_count++, profiling_result);
 
                     if(event_count >= cpu()->vcpu->vm->perf_monitor.events_num)
                     {
