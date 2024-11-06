@@ -34,7 +34,7 @@
 #define ERROR_NO_MORE_EVENT_COUNTERS    UINT64_MAX
 
 // ALL PMU EVENTS
-
+#define SW_INCR 0x00
 #define L1I_CACHE_REFILL 0x01
 #define L1I_TLB_REFILL 0x02
 #define L1D_CACHE_REFILL 0x03
@@ -94,63 +94,64 @@
 #define ATTR_PERF_IMPCT_EVENT9 0xE8         //Counts every cycle there is a stall in the Wr stage because of a store.
 
 static const size_t array_events[] = {
-    L1I_CACHE_REFILL, 
-    L1I_TLB_REFILL, 
-    L1D_CACHE_REFILL, 
-    L1D_CACHE,
-    L1D_TLB_REFILL, 
-    LD_RETIRED,
-    ST_RETIRED, 
-    INST_RETIRED, 
-    EXC_TAKEN,
-    EXC_RETURN, 
-    CID_WRITE_RETIRED, 
-    PC_WRITE_RETIRED, 
-    BR_IMMED_RETIRED,
-    UNALIGNED_LDST_RETIRED, 
-    BR_MIS_PRED, 
-    CPU_CYCLES, 
-    BR_PRED, 
-    MEM_ACCESS,
-    L1I_CACHE, 
-    L1D_CACHE_WB, 
-    L2D_CACHE, 
-    L2D_CACHE_REFILL, 
-    L2D_CACHE_WB,
-    BUS_ACCESS, 
-    MEMORY_ERROR, 
-    BUS_CYCLES, 
-    CHAIN, 
-    BUS_ACCESS_LD, 
-    BUS_ACCESS_ST,
-    BR_INDIRECT_SPEC, 
-    EXC_IRQ, 
-    EXC_FIQ, 
-    EXT_MEM_REQ, 
-    NC_EXT_MEM_REQ, 
-    LINEFILL_PREF,
-    INST_CACH_THRT_OCC, 
-    ENT_RD_ALLOC_MD, 
-    RD_ALLOC_MD, 
-    PREDEC_ERROR,
-    DT_WR_PIPELINE_STALL, 
-    SCU_SNOOPED_CPU_F_CPU, 
-    CD_BR_EXEC, 
-    IND_BR_MISPRED,
-    IND_BR_MISPRED_ADDR_MISCOMP, 
-    CD_BR_MISPRED, 
-    L1I_MEM_ERROR, 
-    L1D_MEM_ERROR,
-    TLB_MEM_ERROR, 
-    ATTR_PERF_IMPCT_EVENT1, 
-    ATTR_PERF_IMPCT_EVENT2, 
-    ATTR_PERF_IMPCT_EVENT3,
-    ATTR_PERF_IMPCT_EVENT4, 
-    ATTR_PERF_IMPCT_EVENT5, 
-    ATTR_PERF_IMPCT_EVENT6,
-    ATTR_PERF_IMPCT_EVENT7, 
-    ATTR_PERF_IMPCT_EVENT8, 
-    ATTR_PERF_IMPCT_EVENT9
+    SW_INCR,                                            // 0
+    L1I_CACHE_REFILL,                                   // 1
+    L1I_TLB_REFILL,                                     // 2
+    L1D_CACHE_REFILL,                                   // 3
+    L1D_CACHE,                                          // 4
+    L1D_TLB_REFILL,                                     // 5
+    LD_RETIRED,                                         // 6
+    ST_RETIRED,                                         // 7
+    INST_RETIRED,                                       // 8
+    EXC_TAKEN,                                          // 9
+    EXC_RETURN,                                         // 10
+    CID_WRITE_RETIRED,                                  // 11
+    PC_WRITE_RETIRED,                                   // 12
+    BR_IMMED_RETIRED,                                   // 13
+    UNALIGNED_LDST_RETIRED,                             // 14
+    BR_MIS_PRED,                                        // 15
+    CPU_CYCLES,                                         // 16
+    BR_PRED,                                            // 17
+    MEM_ACCESS,                                         // 18
+    L1I_CACHE,                                          // 19
+    L1D_CACHE_WB,                                       // 20
+    L2D_CACHE,                                          // 21
+    L2D_CACHE_REFILL,                                   // 22
+    L2D_CACHE_WB,                                       // 23
+    BUS_ACCESS,                                         // 24
+    MEMORY_ERROR,                                       // 25
+    BUS_CYCLES,                                         // 26
+    CHAIN,                                              // 27
+    BUS_ACCESS_LD,                                      // 28
+    BUS_ACCESS_ST,                                      // 29
+    BR_INDIRECT_SPEC,                                   // 30
+    EXC_IRQ,                                            // 31
+    EXC_FIQ,                                            // 32
+    EXT_MEM_REQ,                                        // 33
+    NC_EXT_MEM_REQ,                                     // 34
+    LINEFILL_PREF,                                      // 35
+    INST_CACH_THRT_OCC,                                 // 36
+    ENT_RD_ALLOC_MD,                                    // 37
+    RD_ALLOC_MD,                                        // 38
+    PREDEC_ERROR,                                       // 39
+    DT_WR_PIPELINE_STALL,                               // 40
+    SCU_SNOOPED_CPU_F_CPU,                              // 41
+    CD_BR_EXEC,                                         // 42
+    IND_BR_MISPRED,                                     // 43
+    IND_BR_MISPRED_ADDR_MISCOMP,                        // 44
+    CD_BR_MISPRED,                                      // 45
+    L1I_MEM_ERROR,                                      // 46
+    L1D_MEM_ERROR,                                      // 47
+    TLB_MEM_ERROR,                                      // 48
+    ATTR_PERF_IMPCT_EVENT1,                             // 49
+    ATTR_PERF_IMPCT_EVENT2,                             // 50
+    ATTR_PERF_IMPCT_EVENT3,                             // 51
+    ATTR_PERF_IMPCT_EVENT4,                             // 52
+    ATTR_PERF_IMPCT_EVENT5,                             // 53
+    ATTR_PERF_IMPCT_EVENT6,                             // 54
+    ATTR_PERF_IMPCT_EVENT7,                             // 55
+    ATTR_PERF_IMPCT_EVENT8,                             // 56
+    ATTR_PERF_IMPCT_EVENT9                              // 57
 };
 
 uint64_t pmu_cntr_alloc(void);
