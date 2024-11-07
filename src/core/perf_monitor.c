@@ -34,16 +34,21 @@ void perf_monitor_init(struct vm* vm, struct perf_monitor_config perf_config) {
     if(cpu_is_master()){
         // vaddr for storing PMU events
         vm->perf_monitor.events_num = perf_config.events_num;
-        vm->perf_monitor.num_profiling_samples = perf_config.num_samples * perf_config.events_num;
+        size_t samples_exe = perf_config.num_samples;
         size_t mem_reg_size =   sizeof(size_t) *
                                 vm->perf_monitor.events_num *
-                                vm->perf_monitor.num_profiling_samples *
+                                perf_config.num_samples *
                                 vm->cpu_num;
 
-        if(mem_reg_size > MAX_MEM_SIZE){
-            size_t rem_samples = MAX_MEM_SIZE/(sizeof(size_t) * vm->perf_monitor.events_num * vm->perf_monitor.num_profiling_samples * vm->cpu_num);
+    //    console_printk("MEM size reserved: %d - Mem size needed: %d\n", MAX_MEM_SIZE, mem_reg_size); 
+
+        if(mem_reg_size > MAX_MEM_SIZE){   
+            size_t rem_samples = (sizeof(size_t) * vm->perf_monitor.events_num * vm->perf_monitor.num_profiling_samples * vm->cpu_num)/MAX_MEM_SIZE;
             WARNING("Exceded number of samples by %d", rem_samples);
+            samples_exe = perf_config.num_samples - rem_samples;
         }
+
+        vm->perf_monitor.num_profiling_samples = samples_exe;
 
         size_t num_pages = NUM_PAGES(MAX_MEM_SIZE);
         struct ppages* pa_ptr = NULL;
