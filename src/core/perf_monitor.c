@@ -106,42 +106,30 @@ void perf_monitor_irq_handler(unsigned int irq) {
         // Dump results on cpu master
         if(CHECK_CPUS_MEM_DUMP(cpu()->vcpu->vm->perf_monitor.cpu_mem_dump_bitmap, cpu()->vcpu->vm->cpu_num) && cpu_is_master())
         {
-            size_t event_count = 0;
-            size_t sample_count = 0;
             size_t profiling_result = 0;
 
             for(size_t cpu_index = 0; cpu_index < cpu()->vcpu->vm->cpu_num; cpu_index++)       // Read each CPU
             {
-                sample_count = 1;
                 console_printk("\n\t--CPU-%d--\n\n", cpu_index);
 
                 for(size_t sample_index = 0; sample_index < cpu()->vcpu->vm->perf_monitor.num_profiling_samples; sample_index++)       // Read each sample
                 {
-                    profiling_result = PERF_MONITOR_READ_SAMPLE(cpu()->vcpu->vm->perf_monitor.array_profiling_results,
-                                                                sample_index,
-                                                                event_count,
-                                                                cpu_index,
-                                                                cpu()->vcpu->vm->perf_monitor.events_num,
-                                                                cpu()->vcpu->vm->cpu_num);
-
-                    console_printk("[%d][%d]=%lu\n",sample_count, event_count++, profiling_result);
-
-                    if(event_count >= cpu()->vcpu->vm->perf_monitor.events_num)
+                    for(size_t counter_index = 0; counter_index < cpu()->vcpu->vm->perf_monitor.events_num; counter_index++)
                     {
-                        event_count = 0;
-                        sample_count++;
-                    }
+                        profiling_result = PERF_MONITOR_READ_SAMPLE(cpu()->vcpu->vm->perf_monitor.array_profiling_results,
+                                                                    sample_index,
+                                                                    counter_index,
+                                                                    cpu_index,
+                                                                    cpu()->vcpu->vm->perf_monitor.events_num,
+                                                                    cpu()->vcpu->vm->cpu_num);
 
+                        console_printk("[%d][%d]=%lu\n",sample_index, counter_index, profiling_result);
+                    }
+        
                 }
             }
         }
-        else if(cpu_is_master())
-        {
-            timer_reschedule_interrupt(timer_count);
-            timer_enable();
-        }
     }
-
     else 
     {
         for(size_t counter_id = 0; counter_id < num_counters; counter_id++) {
@@ -155,14 +143,13 @@ void perf_monitor_irq_handler(unsigned int irq) {
                                     cpu()->vcpu->vm->cpu_num,
                                     counter_value);
 
-            cpu()->vcpu->vm->perf_monitor.array_sample_index[cpu()->id]++;
-
-            //console_printk("B4 - CPU%d, count_val %d: %lu\n", cpu()->id, counter_id, counter_value);
-
             events_clear_cntr_ovs(counter_id);
             events_cntr_set(counter_id, UINT32_MAX);
         }
-        timer_reschedule_interrupt(timer_count);
-        timer_enable();
+
+        cpu()->vcpu->vm->perf_monitor.array_sample_index[cpu()->id]++;
     }
+
+    timer_reschedule_interrupt(timer_count);
+    timer_enable();
 }
