@@ -101,7 +101,7 @@ struct vm_config {
 
     /* Definition of Performance Monitor/Profiler */
     bool en_perf_monitor;
-    struct perf_monitor_config perf_monitor;
+    //struct perf_monitor_config perf_monitor;
 };
 
 extern struct config {
@@ -117,6 +117,7 @@ extern struct config {
 
         /* Hypervisor colors */
         colormap_t colors;
+
     } hyp;
 
     /* Definition of shared memory regions to be used by VMs */
@@ -128,6 +129,10 @@ extern struct config {
 
     /* Array list with VM configuration */
     struct vm_config* vmlist;
+
+    /* Hypervisor Perf Monitor*/
+    bool en_perf_monitor;
+    struct perf_monitor_config perf_monitor;
 
 } config;
 
