@@ -11,6 +11,7 @@
 #include <fences.h>
 #include <string.h>
 #include <shmem.h>
+#include <perf_monitor.h>
 
 static struct vm_assignment {
     spinlock_t lock;
@@ -129,6 +130,9 @@ void vmm_init()
     vmm_io_init();
     shmem_init();
 
+    if(config.en_perf_monitor && cpu_is_master())
+        hv_perf_monitor = perf_monitor_init_hypervisor(config.perf_monitor, config.vmlist, config.vmlist_size);
+
     cpu_sync_barrier(&cpu_glb_sync);
 
     bool master = false;
@@ -142,4 +146,5 @@ void vmm_init()
     } else {
         cpu_idle();
     }
+
 }
