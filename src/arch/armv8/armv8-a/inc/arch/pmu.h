@@ -234,11 +234,17 @@ static inline void pmu_cntr_set(size_t counter, unsigned long value) {
 
     // PMSELR_EL0 -> Performance Monitors Event Counter Selection Register
     pmselr = sysreg_pmselr_el0_read();
+
+    //console_printk("\n [PMU] :: counter ID %d \t value: %lu \t PMSELR value read: %lu", counter, value, pmselr);
+
     pmselr = bit_insert(pmselr, counter, 0, 5);
     sysreg_pmselr_el0_write(pmselr);
 
     // Set the PMU counter to overflow after the occurrence of "value" events
     value = UINT32_MAX - value;
+
+    //console_printk("\n [PMU] value: %lu", value);
+
     sysreg_pmxevcntr_el0_write(value);
 }
 
@@ -269,6 +275,8 @@ static inline unsigned long pmu_cntr_get(size_t counter) {
  */
 static inline void pmu_set_evtyper(size_t counter, size_t event) {
     uint64_t pmselr;
+
+    //console_printk("[PMU] Setting event %d to counter %d\n", array_events[event], counter);
 
     // PMSELR_EL0 -> Performance Monitors Event Counter Selection Register
     pmselr = sysreg_pmselr_el0_read();
