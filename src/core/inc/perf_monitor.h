@@ -22,6 +22,8 @@ struct perf_monitor {
     size_t* array_profiling_results;
     size_t num_profiling_samples;
     size_t cpu_mem_dump_bitmap;
+
+    size_t array_cpus_id[PERF_MONITOR_MAX_CPUS];
 };
 
 struct perf_monitor_config {

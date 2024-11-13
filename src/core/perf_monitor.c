@@ -31,7 +31,7 @@ size_t perf_monitor_results[MAX_EVENTS];
 
 void perf_monitor_init(struct vm* vm, struct perf_monitor_config perf_config) {
 
-    if(cpu_is_master()){
+    if(cpu()->id == cpu()->vcpu->vm->master){
         // vaddr for storing PMU events
         vm->perf_monitor.events_num = perf_config.events_num;
         size_t samples_exe = perf_config.num_samples;
@@ -63,7 +63,7 @@ void perf_monitor_init(struct vm* vm, struct perf_monitor_config perf_config) {
     cpu_sync_barrier(&vm->sync);
 
     vm->perf_monitor.array_sample_index[cpu()->id] = 0;
-    vm->perf_monitor.array_sample_index[cpu()->id] = 0;
+    vm->perf_monitor.array_cpus_id[cpu()->vcpu->id] = cpu()->id;
     vm->perf_monitor.cpu_mem_dump_bitmap = 0;
 
     perf_monitor_setup_event_counters(perf_config.events, perf_config.events_num);
@@ -101,19 +101,24 @@ void perf_monitor_irq_handler(unsigned int irq) {
 
     if(cpu()->vcpu->vm->perf_monitor.array_sample_index[cpu()->id] >= cpu()->vcpu->vm->perf_monitor.num_profiling_samples) {
     
-        cpu()->vcpu->vm->perf_monitor.cpu_mem_dump_bitmap ^= (1UL << (size_t)cpu()->id);         // bitmap to know which cpu as reached this position
+        cpu()->vcpu->vm->perf_monitor.cpu_mem_dump_bitmap |= (1UL << (size_t)cpu()->vcpu->id);         // bitmap to know which cpu as reached this position
 
         // Dump results on cpu master
-        if(CHECK_CPUS_MEM_DUMP(cpu()->vcpu->vm->perf_monitor.cpu_mem_dump_bitmap, cpu()->vcpu->vm->cpu_num) && cpu_is_master())
+        if(CHECK_CPUS_MEM_DUMP(cpu()->vcpu->vm->perf_monitor.cpu_mem_dump_bitmap, cpu()->vcpu->vm->cpu_num) && cpu()->id == cpu()->vcpu->vm->master)
         {
+            size_t cpu_index = 0;
             size_t profiling_result = 0;
 
-            for(size_t cpu_index = 0; cpu_index < cpu()->vcpu->vm->cpu_num; cpu_index++)       // Read each CPU
+            console_printk("\n\t > Setup: s%d, p%d\n", cpu()->vcpu->vm->perf_monitor.num_profiling_samples ,cpu()->vcpu->vm->perf_monitor.sampling_period_us);
+
+            for(size_t cpu_count = 0; cpu_count < cpu()->vcpu->vm->cpu_num; cpu_count++)       // Read each CPU
             {
-                console_printk("\n\t--CPU-%d--\n\n", cpu_index);
+                cpu_index = cpu()->vcpu->vm->perf_monitor.array_cpus_id[cpu_count];
+                console_printk("\n\t--vCPU-%d--CPU%d--\n\n", cpu_count, cpu_index);
 
                 for(size_t sample_index = 0; sample_index < cpu()->vcpu->vm->perf_monitor.num_profiling_samples; sample_index++)       // Read each sample
                 {
+                    console_printk("s%d\n",sample_index);
                     for(size_t counter_index = 0; counter_index < cpu()->vcpu->vm->perf_monitor.events_num; counter_index++)
                     {
                         profiling_result = PERF_MONITOR_READ_SAMPLE(cpu()->vcpu->vm->perf_monitor.array_profiling_results,
@@ -123,11 +128,14 @@ void perf_monitor_irq_handler(unsigned int irq) {
                                                                     cpu()->vcpu->vm->perf_monitor.events_num,
                                                                     cpu()->vcpu->vm->cpu_num);
 
-                        console_printk("[%d][%d]=%lu\n",sample_index, counter_index, profiling_result);
+                        console_printk("c%d=%lu\n", counter_index, profiling_result);
                     }
         
                 }
             }
+        }else if(cpu()->id == cpu()->vcpu->vm->master){
+            timer_reschedule_interrupt(timer_count);
+            timer_enable();
         }
     }
     else 
@@ -148,8 +156,9 @@ void perf_monitor_irq_handler(unsigned int irq) {
         }
 
         cpu()->vcpu->vm->perf_monitor.array_sample_index[cpu()->id]++;
-    }
 
-    timer_reschedule_interrupt(timer_count);
-    timer_enable();
+        timer_reschedule_interrupt(timer_count);
+        timer_enable();
+    
+    }
 }
