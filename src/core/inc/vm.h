@@ -86,7 +86,7 @@ struct vm {
     size_t ipc_num;
     struct ipc* ipcs;
 
-    struct perf_monitor perf_monitor;
+    struct perf_monitor_vm perf_monitor;
 };
 
 struct vcpu {
