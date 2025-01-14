@@ -64,6 +64,7 @@ void perf_monitor_init(struct vm* vm, struct perf_monitor_config perf_config) {
 
     vm->perf_monitor.array_sample_index[cpu()->id] = 0;
     vm->perf_monitor.array_cpus_id[cpu()->vcpu->id] = cpu()->id;
+    vm->perf_monitor.sampling_period_us = perf_config.sampling_period_us;
     vm->perf_monitor.cpu_mem_dump_bitmap = 0;
 
     perf_monitor_setup_event_counters(perf_config.events, perf_config.events_num);
@@ -98,9 +99,13 @@ void perf_monitor_timer_init(size_t perf_monitor_period_us) {
 void perf_monitor_irq_handler(unsigned int irq) {
     (void) irq;
     timer_disable();
+    //size_t start_timer = timer_get();
+    //timer_enable();
 
     if(cpu()->vcpu->vm->perf_monitor.array_sample_index[cpu()->id] >= cpu()->vcpu->vm->perf_monitor.num_profiling_samples) {
-    
+        
+        //timer_disable();
+
         cpu()->vcpu->vm->perf_monitor.cpu_mem_dump_bitmap |= (1UL << (size_t)cpu()->vcpu->id);         // bitmap to know which cpu as reached this position
 
         // Dump results on cpu master
@@ -119,6 +124,8 @@ void perf_monitor_irq_handler(unsigned int irq) {
                 for(size_t sample_index = 0; sample_index < cpu()->vcpu->vm->perf_monitor.num_profiling_samples; sample_index++)       // Read each sample
                 {
                     console_printk("s%d\n",sample_index);
+                    //console_printk("s%dt:%d\n",sample_index, cpu()->vcpu->vm->perf_monitor.array_tick_count[cpu_index][sample_index]);
+
                     for(size_t counter_index = 0; counter_index < cpu()->vcpu->vm->perf_monitor.events_num; counter_index++)
                     {
                         profiling_result = PERF_MONITOR_READ_SAMPLE(cpu()->vcpu->vm->perf_monitor.array_profiling_results,
@@ -157,6 +164,10 @@ void perf_monitor_irq_handler(unsigned int irq) {
 
         cpu()->vcpu->vm->perf_monitor.array_sample_index[cpu()->id]++;
 
+        //size_t end_timer = timer_get();
+        //cpu()->vcpu->vm->perf_monitor.array_tick_count[cpu()->id][cpu()->vcpu->vm->perf_monitor.array_sample_index[cpu()->id]-1] = (start_timer-end_timer);     // due to clock is counting down to 0 instead from 0 and up
+        //console_printk("s%dt%lu\n",cpu()->vcpu->vm->perf_monitor.array_sample_index[cpu()->id], (end_timer-start_timer));
+        //timer_disable();        
         timer_reschedule_interrupt(timer_count);
         timer_enable();
     

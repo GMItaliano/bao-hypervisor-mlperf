@@ -12,6 +12,7 @@
 
 #define PERF_MONITOR_MAX_EVENTS 32
 #define PERF_MONITOR_MAX_CPUS   32
+#define PERF_TICK_COUNT         30000
 
 struct perf_monitor {
     size_t array_events[PERF_MONITOR_MAX_EVENTS];
@@ -24,6 +25,7 @@ struct perf_monitor {
     size_t cpu_mem_dump_bitmap;
 
     size_t array_cpus_id[PERF_MONITOR_MAX_CPUS];
+    size_t array_tick_count[PERF_MONITOR_MAX_CPUS][PERF_TICK_COUNT];
 };
 
 struct perf_monitor_config {
