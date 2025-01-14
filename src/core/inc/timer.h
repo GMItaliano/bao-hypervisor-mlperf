@@ -40,4 +40,15 @@ static inline uint64_t timer_reschedule_interrupt_us(uint64_t period)
 	return timer_arch_reschedule_interrupt_us(period);
 }
 
+static inline uint64_t timer_get(void)
+{
+    return timer_arch_get();
+}
+
+static inline uint64_t timer_freq(void)
+{
+    return timer_arch_freq(); 
+}
+
+
 #endif /* __TIMER_MOD_H__ */

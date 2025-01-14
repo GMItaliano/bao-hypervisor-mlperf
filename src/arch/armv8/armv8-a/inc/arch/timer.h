@@ -17,4 +17,7 @@ static inline void timer_arch_define_irq_callback(irq_handler_t handler)
     interrupts_arch_enable((irqid_t)platform.arch.generic_timer.timer_id, true);
 }
 
+uint64_t timer_arch_get(void);
+uint64_t timer_arch_freq(void);
+
 #endif /* __ARCH_TIMER_MOD_H__ */

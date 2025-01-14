@@ -161,3 +161,16 @@ uint64_t timer_arch_reschedule_interrupt_us(uint64_t period) {
     // Return the calculated counter value for the timer.
     return count_value;
 }
+
+uint64_t timer_arch_get(void)
+{   
+    uint64_t read_val = sysreg_cnthp_tval_el2_read();
+
+    return read_val; 
+}
+
+uint64_t timer_arch_freq(void)
+{
+    return timer_arch_get_system_frequency(); 
+}
+
